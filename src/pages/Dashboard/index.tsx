@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, FormEvent } from 'react';
+
+import api from '../../services/api';
 
 import { FiChevronRight } from 'react-icons/fi';
 
@@ -6,67 +8,58 @@ import logo from '../../assets/logo.svg';
 
 import { Title, Form, Repositories } from './styles';
 
+interface Repository {
+  fullname: string;
+  description: string;
+  owner: {
+    login: string;
+    avatar_url: string;
+  };
+}
+
 const Dashboard: React.FC = () => {
+  const [newRepo, setNewRepo] = useState('');
+  const [repositories, setRepositories] = useState<Repository[]>([]);
+
+  async function handleAddRepository(
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> {
+    event.preventDefault();
+
+    const { data: repository } = await api.get<Repository>(`repos/${newRepo}`);
+
+    setRepositories([...repositories, repository]);
+    setNewRepo('');
+  }
+
   return (
     <>
       <img src={logo} alt="Github Explorer"></img>
       <Title>Explore repositórios no Github</Title>
-      <Form>
-        <input placeholder="Digite o nome do repositório" />
+      <Form onSubmit={handleAddRepository}>
+        <input
+          value={newRepo}
+          onChange={(e) => setNewRepo(e.target.value)}
+          placeholder="Digite o nome do repositório"
+        />
         <button type="submit">Pesquisar</button>
       </Form>
 
       <Repositories>
-        <a href="teste">
-          <img
-            src="https://avatars1.githubusercontent.com/u/26724700?s=400&u=b0a596c8360675134b968ebfc129a6fae9296cb1&v=4"
-            alt="Willa Kiane"
-          />
-          <div>
-            <strong>rocketseat/unform</strong>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit ea
-              animi molestias quos quia aspernatur dolores libero! Deserunt,
-              laudantium soluta!
-            </p>
-          </div>
+        {repositories.map((repository) => (
+          <a key={repository.fullname} href="teste">
+            <img
+              src={repository.owner.avatar_url}
+              alt={repository.owner.login}
+            />
+            <div>
+              <strong>{repository.fullname}</strong>
+              <p>{repository.description}</p>
+            </div>
 
-          <FiChevronRight />
-        </a>
-
-        <a href="teste">
-          <img
-            src="https://avatars1.githubusercontent.com/u/26724700?s=400&u=b0a596c8360675134b968ebfc129a6fae9296cb1&v=4"
-            alt="Willa Kiane"
-          />
-          <div>
-            <strong>rocketseat/unform</strong>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit ea
-              animi molestias quos quia aspernatur dolores libero! Deserunt,
-              laudantium soluta!
-            </p>
-          </div>
-
-          <FiChevronRight />
-        </a>
-
-        <a href="teste">
-          <img
-            src="https://avatars1.githubusercontent.com/u/26724700?s=400&u=b0a596c8360675134b968ebfc129a6fae9296cb1&v=4"
-            alt="Willa Kiane"
-          />
-          <div>
-            <strong>rocketseat/unform</strong>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit ea
-              animi molestias quos quia aspernatur dolores libero! Deserunt,
-              laudantium soluta!
-            </p>
-          </div>
-
-          <FiChevronRight />
-        </a>
+            <FiChevronRight />
+          </a>
+        ))}
       </Repositories>
     </>
   );
