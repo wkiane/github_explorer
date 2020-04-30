@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useRouteMatch, Link } from 'react-router-dom';
 
 import logo from '../../assets/logo.svg';
-import api from '../../services/api';
 import { Header, RepositoryInfo, Issues } from './styles';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { getIssues, getRepository } from '../../services/github.service';
 
 interface RepositoryParams {
   repository: string;
@@ -39,12 +39,12 @@ const Repository: React.FC = () => {
   useEffect(() => {
     async function fetchData(): Promise<void> {
       const [repo, iss] = await Promise.all([
-        api.get(`/repos/${params.repository}`),
-        api.get(`/repos/${params.repository}/issues`),
+        getIssues(params.repository),
+        getRepository(params.repository),
       ]);
 
-      setRepository(repo.data);
-      setIssues(iss.data);
+      setRepository(repo);
+      setIssues(iss);
     }
 
     fetchData();

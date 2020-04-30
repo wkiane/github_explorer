@@ -2,7 +2,7 @@ import React, { useState, useEffect, FormEvent } from 'react';
 import { FiChevronRight } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
-import api from '../../services/api';
+import { getRepositories } from '../../services/github.service';
 import logo from '../../assets/logo.svg';
 import { Title, Form, Repositories, Error } from './styles';
 
@@ -48,9 +48,7 @@ const Dashboard: React.FC = () => {
     }
 
     try {
-      const { data: repository } = await api.get<Repository>(
-        `repos/${newRepo}`,
-      );
+      const repository = await getRepositories(newRepo);
 
       setRepositories([...repositories, repository]);
       setNewRepo('');
